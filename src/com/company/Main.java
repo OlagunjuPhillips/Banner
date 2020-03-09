@@ -46,6 +46,6 @@ public class Main{
             }
         }
         writer.close();
-    }
+    } // Generate File method
 
 } // Class Main
