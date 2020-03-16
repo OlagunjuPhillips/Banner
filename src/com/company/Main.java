@@ -7,33 +7,49 @@ public class Main{
     static final String[] name = new String[]{"John", "Kate", "Sam", "Kevin", "Paul", "Maddison", "Cooper", "Smith", "Chris", "Tom"};
     public static void main(String[] args) throws IOException {
 
-
+        // Generate a file of 3325 Student data
         File generatedData = createfile(name);
 
+        // Put every name in the file created in an Array
         String[] names = nameArray(generatedData);
 
+        // put the number of each name in an Array using only Arrays
         int[] numberOfNames = nameNumber(name, names);
 
-        numberOfDifferentNames(name, numberOfNames);
+        // find the number of times each name appears
+        Map<String, Integer> nameFrequency = numberOfDifferentNames(name, numberOfNames);
 
-        ArrayList<String> studentNames = new ArrayList<>();
+        //Transfer the names from the Array to an ArrayList
+        ArrayList<String> studentNames = arrayToList(names);
 
+        //Sort the names in ascending order
         Collections.sort(studentNames);
 
-        checkDuplicateID(generatedData);
+        //function check if an id has a duplicate
+        System.out.println(checkDuplicateID(99890));
 
+        //Create an ArrayList that contains Students creates from the generated file
         ArrayList<Student> studentlist = createStudentList(generatedData);
 
+        //Remove every other duplicate IDs from the ArrayList of Students
         ArrayList<Student> newStudentList = removeDuplicate(studentlist);
 
-        countDifferentNames(studentNames);
+        //Map of Student names to their frequencies
+        countDifferentNames(studentNames) ;
 
+        // Remove duplicate IDs and create an ArrayList of students directly from the generated file
         ArrayList<Student> uniqueStudentList = removeDuplicateID(generatedData);
 
+        //Sort the ArrayList of Students in ascending order of the student IDs
         Collections.sort(uniqueStudentList, Student::compareTo);
 
+        // reverse the ordered student ArrayList into a stack
+        Stack<Student> reversedStudent = reverseStudentList(newStudentList);
 
-        System.out.println(uniqueStudentList);
+        // reverse the ordered student ArrayList using a deque
+        Deque<Student> dequeStudent = reverseStudentWithDeque(newStudentList);
+
+
 
     }
 
@@ -42,43 +58,60 @@ public class Main{
         Random rand = new Random();
         rand.setSeed(5);
         File file = new File("generatedData.csv");
-        PrintWriter writer = null;
 
+        PrintWriter writer = null;
         writer = new PrintWriter(file);
         writer.write("id,name,gpa\n");
 
         for(int i = 0; i < 3325; i++) {
+
+
             if (i < 3324) {
                 int index = rand.nextInt(names.length);
                 String name = names[index];
+
+
                 int id;
                 do {
                     id = rand.nextInt(99999 + 1);
                 } while (id < 90000);
+
+
                 double gpa = 0;
                 do {
                     gpa = rand.nextDouble();
                 } while (gpa > 4);
+
+
                 writer.write(String.format("%s,%s,%s\n", Integer.toString(id), name, gpa));
+
+
             }else{
                 int index = rand.nextInt(names.length);
                 String name = names[index];
+
+
                 int id;
                 do {
                     id = rand.nextInt(99999 + 1);
                 } while (id < 90000);
                 double gpa = 0;
+
+
                 do {
                     gpa = rand.nextDouble();
                 } while (gpa > 4);
+
+
                 writer.write(String.format("%s,%s,%s", Integer.toString(id), name, gpa));
             }
         }
         writer.close();
-    // Generate File method
+
         return file;
     }
     static String[] nameArray(File file) throws FileNotFoundException {
+
         String[] bannerNames = new String[3325];
         Scanner fileScan = null;
         fileScan = new Scanner(file);
@@ -103,9 +136,11 @@ public class Main{
             }
             numberNames[i] = total;
         }
+
         return numberNames;
     }
-    static void countDifferentNames(ArrayList<String> studentNames){
+    static Map<String, Integer> countDifferentNames(ArrayList<String> studentNames){
+        Map<String, Integer> nameMap = new HashMap<>();
         int total = 1;
         for(int i = 0; i < studentNames.size(); i++){
             if(i != studentNames.size() - 1){
@@ -113,19 +148,23 @@ public class Main{
                     total++;
                 }
                 else {
-                    System.out.printf("The number of student with name \"%s\" is %d\n", studentNames.get(i), total);
+                    nameMap.put(studentNames.get(i), total);
                     total = 1;
                 }
             } else{
-                System.out.printf("The number of student with name \"%s\" is %d\n", studentNames.get(i), total);
+                nameMap.put(studentNames.get(i), total);
             }
         }
+
+        return nameMap;
     }
 
-    static void checkDuplicateID(File file) throws FileNotFoundException {
+    static boolean checkDuplicateID(int id) throws FileNotFoundException {
         Scanner fileScan = null;
+        File file = new File("generatedData.csv");
         fileScan = new Scanner(file);
         ArrayList<String> idArray = new ArrayList<>();
+        ArrayList<Integer> duplicateIdsArr = new ArrayList<>();
         String headers = fileScan.nextLine();
         int row = 1;
         while(fileScan.hasNext()){
@@ -133,13 +172,18 @@ public class Main{
             String[] parts = line.split(",");
             row++;
             if(idArray.contains(parts[0])){
-                System.out.printf("Row %d is a duplicate.\n",row);
+                duplicateIdsArr.add(Integer.parseInt(parts[0]));
             }
             idArray.add(parts[0]);
-
-            }
-
         }
+        if(duplicateIdsArr.contains(id)){
+
+            return true;
+        }
+
+        return false;
+    }
+
         static ArrayList<Student> createStudentList(File file) throws FileNotFoundException {
         ArrayList<Student> studentList = new ArrayList<>();
         Scanner fileScan = null;
@@ -163,6 +207,7 @@ public class Main{
                 checkDuplicate.add(student.getId());
             }
         }
+
         return studentList;
         }
         static ArrayList<Student> removeDuplicateID(File file) throws FileNotFoundException {
@@ -180,23 +225,46 @@ public class Main{
                 studentList.add(student);
             }
         }
+
         return studentList;
         }
-        static void numberOfDifferentNames(String[] nameArray, int[] numberOfNames){
-            int total = 0;
+
+
+        static Map<String, Integer> numberOfDifferentNames(String[] nameArray, int[] numberOfNames){
+            Map<String, Integer> namesMapToFrequency= new HashMap<>();
             for(int i = 0; i < numberOfNames.length; i++){
-                total += numberOfNames[i];
-                System.out.printf("The name \"%s\" occurs %d times\n",nameArray[i],numberOfNames[i]);
+                namesMapToFrequency.put(nameArray[i], numberOfNames[i]);
             }
-            System.out.printf("Total number of names is %d\n",total);
+            return namesMapToFrequency;
         }
+
         static ArrayList<String> arrayToList(String[] names){
             ArrayList<String> studentNames = new ArrayList<>();
             for(int i = 0; i < names.length; i++){
                 studentNames.add(names[i]);
             }
+
             return studentNames;
         }
 
+        static Stack<Student> reverseStudentList(ArrayList<Student> students){
+            Stack<Student> studentStack = new Stack<>();
+            for(Student student : students){
+               studentStack.push(student);
+            }
 
+            return studentStack;
+        }
+
+        static Deque<Student> reverseStudentListUsingStack(ArrayList<Student> students){
+            Deque<Student> studentDeque = new MyStack();
+        }
+
+        static Deque<Student> reverseStudentWithDeque(ArrayList<Student> students){
+            Deque<Student> studentDeque = new LinkedList<>();
+            for(Student student : students){
+                studentDeque.push(student);
+            }
+            return studentDeque;
+        }
 } // Class Main
