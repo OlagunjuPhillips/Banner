@@ -4,7 +4,11 @@ import java.util.*;
 import java.io.*;
 
 public class Main{
-    static final String[] name = new String[]{"John", "Kate", "Sam", "Kevin", "Paul", "Maddison", "Cooper", "Smith", "Chris", "Tom"};
+
+    // *Phillips*
+    // static final String[] name = new String[]{"John", "Kate", "Sam", "Kevin", "Paul", "Maddison", "Cooper", "Smith", "Chris", "Tom"};
+    static final String[] name = {"John", "Kate", "Sam", "Kevin", "Paul", "Maddison", "Cooper", "Smith", "Chris", "Tom"};
+
     public static void main(String[] args) throws IOException {
 
         // Generate a file of 3325 Student data
@@ -258,6 +262,7 @@ public class Main{
 
         static Deque<Student> reverseStudentListUsingStack(ArrayList<Student> students){
             Deque<Student> studentDeque = new MyStack();
+            return studentDeque;
         }
 
         static Deque<Student> reverseStudentWithDeque(ArrayList<Student> students){
