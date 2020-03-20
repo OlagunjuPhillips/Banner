@@ -1,23 +1,29 @@
 package com.company;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.io.*;
 
 public class Main{
-    static final String[] name = new String[]{"John", "Kate", "Sam", "Kevin", "Paul", "Maddison", "Cooper", "Smith", "Chris", "Tom"};
+
+    // *Phillips*
+    // static final String[] NAME = new String[]{"John", "Kate", "Sam", "Kevin", "Paul", "Maddison", "Cooper", "Smith", "Chris", "Tom"};
+    static final String[] NAMES = {"John", "Kate", "Sam", "Kevin", "Paul", "Maddison", "Cooper", "Smith", "Chris", "Tom"};
+    static final String FILENAME = "generatedData.csv";
+    static final int NUM_OF_ROWS  = 3325;
+
     public static void main(String[] args) throws IOException {
 
         // Generate a file of 3325 Student data
-        File generatedData = createfile(name);
+        File generatedData = createfile(NAMES);
+        // *Phillips* After you make whatever changes to createFile(), push your code to your repo
 
         // Put every name in the file created in an Array
         String[] names = nameArray(generatedData);
 
         // put the number of each name in an Array using only Arrays
-        int[] numberOfNames = nameNumber(name, names);
+        int[] numberOfNames = nameNumber(NAMES, names);
 
         // find the number of times each name appears
-        Map<String, Integer> nameFrequency = numberOfDifferentNames(name, numberOfNames);
+        Map<String, Integer> nameFrequency = numberOfDifferentNames(NAMES, numberOfNames);
 
         //Transfer the names from the Array to an ArrayList
         ArrayList<String> studentNames = arrayToList(names);
@@ -53,60 +59,87 @@ public class Main{
 
     }
 
+    // *Phillips* I'm confused by this method signature (the header of your method/function).
+    // To create a file, shouldn't you use the user's filename rather than your favorite filename?
     static File createfile(String[] names) throws IOException {
 
         Random rand = new Random();
+
+        // *Phillips* Maybe your user doesn't want to use 5 as the seed.
         rand.setSeed(5);
+
+        // *Phillips* You need documentation on this method because you're creating a CSV
+        // but the specs don't say to do this.
         File file = new File("generatedData.csv");
 
-        PrintWriter writer = null;
-        writer = new PrintWriter(file);
-        writer.write("id,name,gpa\n");
+        // *Phillips*  This is terrible code.  Here's how it should be written.
+        try(PrintWriter writer = new PrintWriter(new File(FILENAME))) {
+            for (int i = 0; i < NUM_OF_ROWS; i++) {
+                // randomly generate an id in 90_000..99_999
+                int id = rand.nextInt(10_000) + 90_000;
 
-        for(int i = 0; i < 3325; i++) {
+                // randomly generate a first name
+                String name = NAMES[rand.nextInt(NAMES.length)];
 
+                // randomly generate a gpa
+                // it's not so obvious how to do this since rand.nextDouble gives values in [0..1]
+                int lowerBound = 0;
+                int upperBound = 4;
+                double gpa = lowerBound + rand.nextDouble() * (upperBound - lowerBound);  // think about why this works
 
-            if (i < 3324) {
-                int index = rand.nextInt(names.length);
-                String name = names[index];
-
-
-                int id;
-                do {
-                    id = rand.nextInt(99999 + 1);
-                } while (id < 90000);
-
-
-                double gpa = 0;
-                do {
-                    gpa = rand.nextDouble();
-                } while (gpa > 4);
-
-
-                writer.write(String.format("%s,%s,%s\n", Integer.toString(id), name, gpa));
-
-
-            }else{
-                int index = rand.nextInt(names.length);
-                String name = names[index];
-
-
-                int id;
-                do {
-                    id = rand.nextInt(99999 + 1);
-                } while (id < 90000);
-                double gpa = 0;
-
-
-                do {
-                    gpa = rand.nextDouble();
-                } while (gpa > 4);
-
-
-                writer.write(String.format("%s,%s,%s", Integer.toString(id), name, gpa));
+                // *Phillips* Now you write to the file
             }
+        } catch(FileNotFoundException e) {
+            e.getStackTrace();
         }
-        writer.close();
+//        PrintWriter writer = null;
+//        writer = new PrintWriter(file);
+//        writer.write("id,name,gpa\n");
+//
+//        for(int i = 0; i < 3325; i++) {
+//
+//
+//            if (i < 3324) {
+//                int index = rand.nextInt(names.length);
+//                String name = names[index];
+//
+//
+//                int id;
+//                do {
+//                    id = rand.nextInt(99999 + 1);
+//                } while (id < 90000);
+//
+//
+//                double gpa = 0;
+//                do {
+//                    gpa = rand.nextDouble();
+//                } while (gpa > 4);
+//
+//
+//                writer.write(String.format("%s,%s,%s\n", Integer.toString(id), name, gpa));
+//
+//
+//            }else{
+//                int index = rand.nextInt(names.length);
+//                String name = names[index];
+//
+//
+//                int id;
+//                do {
+//                    id = rand.nextInt(99999 + 1);
+//                } while (id < 90000);
+//                double gpa = 0;
+//
+//
+//                do {
+//                    gpa = rand.nextDouble();
+//                } while (gpa > 4);
+//
+//
+//                writer.write(String.format("%s,%s,%s", Integer.toString(id), name, gpa));
+//            }
+//        }
+//        writer.close();
 
         return file;
     }
@@ -126,7 +159,7 @@ public class Main{
     return bannerNames;
     }
     static int[] nameNumber(String[] actualNames, String[] nameArray){
-        int[] numberNames = new int[10];
+        int[] numberNames = new int[10];  // *Phillips* how do you know this should be 10?
         for(int i = 0; i < actualNames.length; i++){
             int total = 0;
             for(int j = 0; j < 3325; j++){
@@ -258,6 +291,7 @@ public class Main{
 
         static Deque<Student> reverseStudentListUsingStack(ArrayList<Student> students){
             Deque<Student> studentDeque = new MyStack();
+            return studentDeque;
         }
 
         static Deque<Student> reverseStudentWithDeque(ArrayList<Student> students){
