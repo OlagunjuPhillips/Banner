@@ -16,58 +16,60 @@ public class Main{
         // Generate a file of 3325 Student data
         //*  I see that I do not have to create a variable for the generated File.
 
-        createfile(NAMES);
+        createfile();
 
         // *Phillips* After you make whatever changes to createFile(), push your code to your repo
 
 
         // Put every name in the file created in an Array
-//        String[] names = nameArray(generatedData);
+        String[] names = nameArray(); // function now takes no parameter.
+
 
         // put the number of each name in an Array using only Arrays
-//        int[] numberOfNames = nameNumber(NAMES, names);
-//
-//        // find the number of times each name appears
-//        Map<String, Integer> nameFrequency = numberOfDifferentNames(NAMES, numberOfNames);
-//
-//        //Transfer the names from the Array to an ArrayList
-//        ArrayList<String> studentNames = arrayToList(names);
-//
-//        //Sort the names in ascending order
-//        Collections.sort(studentNames);
-//
-//        //function check if an id has a duplicate
-//        System.out.println(checkDuplicateID(99890));
-//
-//        //Create an ArrayList that contains Students creates from the generated file
-////        ArrayList<Student> studentlist = createStudentList(generatedData);
-//
-//        //Remove every other duplicate IDs from the ArrayList of Students
-//        ArrayList<Student> newStudentList = removeDuplicate(studentlist);
-//
-//        //Map of Student names to their frequencies
-//        countDifferentNames(studentNames) ;
-//
-//        // Remove duplicate IDs and create an ArrayList of students directly from the generated file
-////        ArrayList<Student> uniqueStudentList = removeDuplicateID(generatedData);
-//
-//        //Sort the ArrayList of Students in ascending order of the student IDs
-//        Collections.sort(uniqueStudentList, Student::compareTo);
-//
-//        // reverse the ordered student ArrayList into a stack
-//        Stack<Student> reversedStudent = reverseStudentList(newStudentList);
-//
-//        // reverse the ordered student ArrayList using a deque
-//        Deque<Student> dequeStudent = reverseStudentWithDeque(newStudentList);
+        int[] numberOfNames = nameNumber(names);
 
+        // find the number of times each name appears
+        Map<String, Integer> nameFrequency = numberOfDifferentNames(numberOfNames);
 
+        //Transfer the names from the Array to an ArrayList
+        ArrayList<String> studentNames = arrayToList(names);
+
+        //Sort the names in ascending order
+        Collections.sort(studentNames);
+
+        //function check if an id has a duplicate
+        checkDuplicateID(99890); // This fuction checks if a particular id has a duplicate.
+
+        //Create an ArrayList that contains Students creates from the generated file
+        ArrayList<Student> studentlist = createStudentList();
+
+        //Remove every other duplicate IDs from the ArrayList of Students
+        ArrayList<Student> newStudentList = removeDuplicate(studentlist);
+
+        //Map of Student names to their frequencies
+        countDifferentNames(studentNames) ;
+
+        // Remove duplicate IDs and create an ArrayList of students directly from the generated file
+        ArrayList<Student> uniqueStudentList = removeDuplicateID();
+
+        //Sort the ArrayList of Students in ascending order of the student IDs
+        Collections.sort(uniqueStudentList, Student::compareTo);
+
+        // reverse the ordered student ArrayList into a stack
+        Stack<Student> reversedStudent = reverseStudentList(newStudentList);
+
+        // reverse the ordered student ArrayList using a deque
+        Deque<Student> dequeStudent = reverseStudentWithDeque(newStudentList);
+
+        Deque<Student> studentStackDeque = reverseStudentListUsingStack(newStudentList);
 
     }
 
     // *Phillips* I'm confused by this method signature (the header of your method/function).
     // To create a file, shouldn't you use the user's filename rather than your favorite filename?
-    static void createfile(String[] names) throws IOException {
-        System.out.print("Enter  set seed: ");
+
+    static void createfile() throws IOException {
+        System.out.print("Enter set seed: ");
         int seed = console.nextInt();
 
         Random rand = new Random();
@@ -101,56 +103,6 @@ public class Main{
         } catch(FileNotFoundException e) {
             e.getStackTrace();
         }
-
-//        PrintWriter writer = null;
-//        writer = new PrintWriter(file);
-//        writer.write("id,name,gpa\n");
-//
-//        for(int i = 0; i < 3325; i++) {
-//
-//
-//            if (i < 3324) {
-//                int index = rand.nextInt(names.length);
-//                String name = names[index];
-//
-//
-//                int id;
-//                do {
-//                    id = rand.nextInt(99999 + 1);
-//                } while (id < 90000);
-//
-//
-//                double gpa = 0;
-//                do {
-//                    gpa = rand.nextDouble();
-//                } while (gpa > 4);
-//
-//
-//                writer.write(String.format("%s,%s,%s\n", Integer.toString(id), name, gpa));
-//
-//
-//            }else{
-//                int index = rand.nextInt(names.length);
-//                String name = names[index];
-//
-//
-//                int id;
-//                do {
-//                    id = rand.nextInt(99999 + 1);
-//                } while (id < 90000);
-//                double gpa = 0;
-//
-//
-//                do {
-//                    gpa = rand.nextDouble();
-//                } while (gpa > 4);
-//
-//
-//                writer.write(String.format("%s,%s,%s", Integer.toString(id), name, gpa));
-//            }
-//        }
-//        writer.close();
-
     }
     static String[] nameArray() throws FileNotFoundException {
 
@@ -169,12 +121,12 @@ public class Main{
         return bannerNames;
     }
 
-    static int[] nameNumber(String[] actualNames, String[] nameArray){
-        int[] numberNames = new int[actualNames.length];  // *Phillips* how do you know this should be 10?
-        for(int i = 0; i < actualNames.length; i++){
+    static int[] nameNumber(String[] nameArray){
+        int[] numberNames = new int[NAMES.length];  // *Phillips* how do you know this should be 10?
+        for(int i = 0; i < NAMES.length; i++){
             int total = 0;
             for(int j = 0; j < 3325; j++){
-                if(actualNames[i].equals(nameArray[j])){
+                if(NAMES[i].equals(nameArray[j])){
                     total++;
                 }
             }
@@ -228,8 +180,9 @@ public class Main{
         return false;
     }
 
-    static ArrayList<Student> createStudentList(File file) throws FileNotFoundException {
+    static ArrayList<Student> createStudentList() throws FileNotFoundException {
         ArrayList<Student> studentList = new ArrayList<>();
+        File file = new File(FILENAME);
         Scanner fileScan = null;
         fileScan = new Scanner(file);
         String headers = fileScan.nextLine();
@@ -254,8 +207,9 @@ public class Main{
 
         return studentList;
     }
-    static ArrayList<Student> removeDuplicateID(File file) throws FileNotFoundException {
+    static ArrayList<Student> removeDuplicateID() throws FileNotFoundException {
         Scanner fileScan = null;
+        File file = new File(FILENAME);
         fileScan = new Scanner(file);
         ArrayList<String> id = new ArrayList<>();
         ArrayList<Student> studentList = new ArrayList<>();
@@ -274,10 +228,10 @@ public class Main{
     }
 
 
-    static Map<String, Integer> numberOfDifferentNames(String[] nameArray, int[] numberOfNames){
+    static Map<String, Integer> numberOfDifferentNames(int[] numberOfNames){
         Map<String, Integer> namesMapToFrequency= new HashMap<>();
         for(int i = 0; i < numberOfNames.length; i++){
-            namesMapToFrequency.put(nameArray[i], numberOfNames[i]);
+            namesMapToFrequency.put(NAMES[i], numberOfNames[i]);
         }
         return namesMapToFrequency;
     }
@@ -312,4 +266,6 @@ public class Main{
         }
         return studentDeque;
     }
-} // Class Main
+
+
+}
