@@ -1,5 +1,4 @@
 package com.company;
-import java.sql.Time;
 import java.util.*;
 import java.io.*;
 
@@ -16,22 +15,18 @@ public class Main{
     public static void main(String[] args) throws IOException {
 
         // Generate a file of 3325 Student data
-        //*  I see that I do not have to create a variable for the generated File.
-
         createfile();
 
         // *Phillips* After you make whatever changes to createFile(), push your code to your repo
-
-
         // Put every name in the file created in an Array
         String[] names = nameArray(); // function now takes no parameter.
 
-
         // put the number of each name in an Array using only Arrays
-//        int[] numberOfNames = nameNumber(names);
+        int[] numberOfNames = nameNumber(names);
 
         // find the number of times each name appears
-//        Map<String, Integer> nameFrequency = numberOfDifferentNames(numberOfNames);
+        Map<String, Integer> nameFrequency = numberOfDifferentNames(numberOfNames);
+        System.out.print("Number of times each name appears is: "+ nameFrequency);
 
         //Transfer the names from the Array to an ArrayList
         ArrayList<String> studentNames = arrayToList(names);
@@ -40,22 +35,25 @@ public class Main{
         Collections.sort(studentNames);
 
         //function check if an id has a duplicate
-        checkDuplicateID(99890); // This fuction checks if a particular id has a duplicate.
+        int id = 0;
+        checkDuplicateID(id); // This fuction checks if a particular id has a duplicate.
 
-        //Create an ArrayList that contains Students creates from the generated file
-        ArrayList<Student> studentlist = createStudentList();
+        //Create an ArrayList that contains Students created from the generated file
+        ArrayList<Student> studentList = createStudentList();
 
         //Remove every other duplicate IDs from the ArrayList of Students
-        ArrayList<Student> newStudentList = removeDuplicate(studentlist);
+        ArrayList<Student> newStudentList = removeDuplicate(studentList);
 
         //Map of Student names to their frequencies
-        countDifferentNames(studentNames) ;
+        System.out.print("The number of different names are: ");
+        System.out.println(countDifferentNames(studentNames));
+
 
         // Remove duplicate IDs and create an ArrayList of students directly from the generated file
         ArrayList<Student> uniqueStudentList = removeDuplicateID();
 
         //Sort the ArrayList of Students in ascending order of the student IDs
-        Collections.sort(uniqueStudentList, Student::compareTo);
+        uniqueStudentList.sort(Student::compareTo);
 
         // reverse the ordered student ArrayList into a stack
         Stack<Student> reversedStudent = reverseStudentList(newStudentList);
@@ -63,13 +61,18 @@ public class Main{
         // reverse the ordered student ArrayList using a deque
         Deque<Student> dequeStudent = reverseStudentWithDeque(newStudentList);
 
-//        Deque<Student> studentStackDeque = reverseStudentListUsingStack(newStudentList);
+        //reverse the ordered student Arraylist using a deque initialized with a stack
+        System.out.println(reverseDequeWithStack(uniqueStudentList));
+        // I am still not sure how to use a stack to make a deque.
+
 
         try {
-            numberOfLinesToOpen(uniqueStudentList);
+            numberOfLinesToOpen(uniqueStudentList); // The cafeteria simulation.
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        System.out.println(checkIdSet(uniqueStudentList));
 
     }
 
@@ -204,16 +207,15 @@ public class Main{
         return studentList;
     }
     static ArrayList<Student> removeDuplicateID() throws FileNotFoundException {
-        Scanner fileScan = null;
         File file = new File(FILENAME);
-        fileScan = new Scanner(file);
+        Scanner fileScan = new Scanner(file);
         ArrayList<String> id = new ArrayList<>();
         ArrayList<Student> studentList = new ArrayList<>();
         String headers = fileScan.nextLine();
         while(fileScan.hasNext()){
             String line = fileScan.nextLine();
             String[] parts = line.split(",");
-            if(id.contains(parts[0]) == false){
+            if(!id.contains(parts[0])){
                 id.add(parts[0]);
                 Student student = new Student(Integer.parseInt(parts[0]), parts[1], Double.parseDouble(parts[2]));
                 studentList.add(student);
@@ -257,6 +259,12 @@ public class Main{
         return studentDeque;
     }
 
+    static Deque<Student> reverseDequeWithStack(ArrayList<Student>  students){
+        Deque<Student> studentDeque = new MyStack();
+        studentDeque.addAll(students);
+        return studentDeque;
+    }
+
     static void numberOfLinesToOpen(ArrayList<Student> studentList) throws InterruptedException {
         Random rand = new Random();
         Queue<Student> studentQueue = new ArrayDeque<>();
@@ -271,9 +279,7 @@ public class Main{
             int studentOnLine = rand.nextInt(50);
             int waitedOn = rand.nextInt(40);
             int numberOfLines = 1;
-            System.out.println(time);
 
-            System.out.println("Number of students added to line is: " + studentOnLine);
 
             for (int i = 0; i < studentOnLine; i++) {
                 int pickStudent = rand.nextInt(studentList.size());
@@ -283,8 +289,8 @@ public class Main{
 
             numberOfLines += studentQueue.size()/40;
             MyTime newTime = new MyTime(startTime.getHour()+time);
-            System.out.println(studentQueue.size());
             System.out.printf("Number of lines to open at %s is %d\n", newTime, numberOfLines);
+            System.out.println();
 
             //I'm sorry, I took the easy way out.
 
@@ -306,4 +312,17 @@ public class Main{
             Thread.sleep(2000);
         }
     }
+
+    static boolean checkIdSet(ArrayList<Student> studentList){
+        int[] idList = new int[studentList.size()];
+        for(int i = 0;i < studentList.size();i++){
+            Student s =  studentList.get(i);
+            idList[i] = (s.getId());
+        }
+        Set<Integer> idSet = new HashSet<>();
+        for (int value : idList) idSet.add(value);
+
+        return idSet.size() == idList.length;
+    }
+
 }
