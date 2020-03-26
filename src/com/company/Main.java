@@ -1,4 +1,5 @@
 package com.company;
+import java.sql.Time;
 import java.util.*;
 import java.io.*;
 
@@ -10,6 +11,7 @@ public class Main{
     static final String FILENAME = "generatedData.csv";
     static final int NUM_OF_ROWS  = 3325;
     static Scanner console = new Scanner(System.in);
+    static Random rand = new Random();
 
     public static void main(String[] args) throws IOException {
 
@@ -26,10 +28,10 @@ public class Main{
 
 
         // put the number of each name in an Array using only Arrays
-        int[] numberOfNames = nameNumber(names);
+//        int[] numberOfNames = nameNumber(names);
 
         // find the number of times each name appears
-        Map<String, Integer> nameFrequency = numberOfDifferentNames(numberOfNames);
+//        Map<String, Integer> nameFrequency = numberOfDifferentNames(numberOfNames);
 
         //Transfer the names from the Array to an ArrayList
         ArrayList<String> studentNames = arrayToList(names);
@@ -61,18 +63,22 @@ public class Main{
         // reverse the ordered student ArrayList using a deque
         Deque<Student> dequeStudent = reverseStudentWithDeque(newStudentList);
 
-        Deque<Student> studentStackDeque = reverseStudentListUsingStack(newStudentList);
+//        Deque<Student> studentStackDeque = reverseStudentListUsingStack(newStudentList);
+
+        try {
+            numberOfLinesToOpen(uniqueStudentList);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 
     // *Phillips* I'm confused by this method signature (the header of your method/function).
     // To create a file, shouldn't you use the user's filename rather than your favorite filename?
 
-    static void createfile() throws IOException {
+    static void createfile(){
         System.out.print("Enter set seed: ");
         int seed = console.nextInt();
-
-        Random rand = new Random();
 
         // *Phillips* Maybe your user doesn't want to use 5 as the seed.
         rand.setSeed(seed);
@@ -98,7 +104,7 @@ public class Main{
                 double gpa = lowerBound + rand.nextDouble() * (upperBound - lowerBound);  // think about why this works
 
                 // *Phillips* Now you write to the file
-                writer.write(Integer.toString(id)+","+name+","+Double.toString(gpa)+"\n");
+                writer.write(id+","+name+","+gpa+"\n");
             }
         } catch(FileNotFoundException e) {
             e.getStackTrace();
@@ -108,8 +114,7 @@ public class Main{
 
         File file = new File(FILENAME);
         String[] bannerNames = new String[3325];
-        Scanner fileScan = null;
-        fileScan = new Scanner(file);
+        Scanner fileScan = new Scanner(file);
         String headers = fileScan.nextLine();
         int i = 0;
         while(fileScan.hasNext()){
@@ -156,35 +161,26 @@ public class Main{
     }
 
     static boolean checkDuplicateID(int id) throws FileNotFoundException {
-        Scanner fileScan = null;
         File file = new File(FILENAME);
-        fileScan = new Scanner(file);
+        Scanner fileScan = new Scanner(file);
         ArrayList<String> idArray = new ArrayList<>();
         ArrayList<Integer> duplicateIdsArr = new ArrayList<>();
         String headers = fileScan.nextLine();
-        int row = 1;
         while(fileScan.hasNext()){
             String line = fileScan.nextLine();
             String[] parts = line.split(",");
-            row++;
             if(idArray.contains(parts[0])){
                 duplicateIdsArr.add(Integer.parseInt(parts[0]));
             }
             idArray.add(parts[0]);
         }
-        if(duplicateIdsArr.contains(id)){
-
-            return true;
-        }
-
-        return false;
+        return duplicateIdsArr.contains(id);
     }
 
     static ArrayList<Student> createStudentList() throws FileNotFoundException {
         ArrayList<Student> studentList = new ArrayList<>();
         File file = new File(FILENAME);
-        Scanner fileScan = null;
-        fileScan = new Scanner(file);
+        Scanner fileScan = new Scanner(file);
         String headers = fileScan.nextLine();
         while(fileScan.hasNext()){
             String line = fileScan.nextLine();
@@ -238,9 +234,7 @@ public class Main{
 
     static ArrayList<String> arrayToList(String[] names){
         ArrayList<String> studentNames = new ArrayList<>();
-        for(int i = 0; i < names.length; i++){
-            studentNames.add(names[i]);
-        }
+        Collections.addAll(studentNames, names);
 
         return studentNames;
     }
@@ -254,10 +248,6 @@ public class Main{
         return studentStack;
     }
 
-    static Deque<Student> reverseStudentListUsingStack(ArrayList<Student> students){
-        Deque<Student> studentDeque = new MyStack();
-        return studentDeque;
-    }
 
     static Deque<Student> reverseStudentWithDeque(ArrayList<Student> students){
         Deque<Student> studentDeque = new LinkedList<>();
@@ -267,5 +257,53 @@ public class Main{
         return studentDeque;
     }
 
+    static void numberOfLinesToOpen(ArrayList<Student> studentList) throws InterruptedException {
+        Random rand = new Random();
+        Queue<Student> studentQueue = new ArrayDeque<>();
+        MyTime startTime = new MyTime(7);
 
+        int cafeteriaCapacity = 0;
+
+        int numberOfHours = 12;
+
+        for(int time = 0; time < numberOfHours; time++) {
+
+            int studentOnLine = rand.nextInt(50);
+            int waitedOn = rand.nextInt(40);
+            int numberOfLines = 1;
+            System.out.println(time);
+
+            System.out.println("Number of students added to line is: " + studentOnLine);
+
+            for (int i = 0; i < studentOnLine; i++) {
+                int pickStudent = rand.nextInt(studentList.size());
+                Student student = studentList.get(pickStudent);
+                studentQueue.add(student);
+            }
+
+            numberOfLines += studentQueue.size()/40;
+            MyTime newTime = new MyTime(startTime.getHour()+time);
+            System.out.println(studentQueue.size());
+            System.out.printf("Number of lines to open at %s is %d\n", newTime, numberOfLines);
+
+            //I'm sorry, I took the easy way out.
+
+
+            if (studentOnLine >= waitedOn) {
+                for (int i = 0; i < waitedOn; i++) {
+                    studentQueue.remove();
+                    cafeteriaCapacity++;
+                }
+            } else {
+                for (int i = 0; i < studentOnLine; i++) {
+                    studentQueue.remove();
+                    cafeteriaCapacity++;
+                }
+            }
+            if(cafeteriaCapacity >= 200){
+                break;
+            }
+            Thread.sleep(2000);
+        }
+    }
 }
